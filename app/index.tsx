@@ -1,4 +1,5 @@
-import { Text, View, Button, StyleSheet } from "react-native";
+import { Text, View, Pressable, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { getHttp, postHttp, postMarks } from "./http/http";
 import {
   getBoardPath,
@@ -7,17 +8,11 @@ import {
   setMarksPath,
 } from "./http/url";
 import { useEffect, useState } from "react";
-import { BoardSquare, BoardSquareState } from "./util/dataTypes";
+import { BoardSquare, BoardSquareState, WinningStatus } from "./util/dataTypes";
 import { SelectMark } from "./component/SelectMark";
 import Board from "./component/Board";
-import { Winner } from "./component/Winner";
-
-export enum WinningStatus {
-  DRAW = "DRAW",
-  X = "X",
-  O = "O",
-  NO_WINNER = " ",
-}
+import Winner from "./component/Winner";
+import { linearGradientColors } from "./util/linearGradient";
 
 interface JSONData {
   board: BoardSquare[][];
@@ -98,6 +93,13 @@ export default function Index() {
   }
 
   useEffect(() => {
+    async function resetBoard() {
+      await getHttp(resetBoardPath);
+    }
+    resetBoard();
+  }, []);
+
+  useEffect(() => {
     async function sendMarks() {
       const result = await postMarks(setMarksPath, marks);
       await getBoard();
@@ -106,7 +108,8 @@ export default function Index() {
   }, [marks]);
 
   return (
-    <View
+    <LinearGradient
+      colors={linearGradientColors}
       style={{
         flex: 1,
         justifyContent: "center",
@@ -117,7 +120,7 @@ export default function Index() {
       <View>{error && <Text>{error}</Text>}</View>
       <View>{loading && <Text>Loading</Text>}</View>
       <View>
-        <Winner onPressNewGame={onPressReset} winner={winner} />
+        <Winner board={board} onPressNewGame={onPressReset} winner={winner} />
         {marks.playerMark === BoardSquareState.EMPTY && (
           <View>
             <SelectMark onSelectMark={onSelectMark} />
@@ -125,13 +128,35 @@ export default function Index() {
         )}
         {board && (
           <View>
-            <Board board={board} onPressSquare={onPressSquare} />
-            <Button onPress={onPressReset} title="Reset" />
+            <View style={styles.boardContainer}>
+              <Board board={board} onPressSquare={onPressSquare} />
+            </View>
+            <View style={styles.resetButtonContainer}>
+              <Pressable onPress={onPressReset}>
+                <Text style={styles.resetButtonText}>Restart</Text>
+              </Pressable>
+            </View>
           </View>
         )}
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  mainContainer: {
+    flexDirection: "column",
+  },
+  gameAreaContainer: {},
+  boardContainer: {
+    margin: 25,
+  },
+  resetButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  resetButtonText: {
+    color: "white",
+    fontSize: 25,
+  },
+});
