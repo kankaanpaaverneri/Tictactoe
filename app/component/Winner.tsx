@@ -1,23 +1,70 @@
 import { View, Modal, Text, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Board from "./Board";
-import { BoardSquare, WinningStatus } from "../util/dataTypes";
-
-import { linearGradientColors } from "../util/linearGradient";
+import {
+  BoardSquare,
+  BoardSquareState,
+  WinningStatus,
+} from "../util/dataTypes";
+import { useEffect, useState } from "react";
+import {
+  defaultGradientColors,
+  winnerGradientColors,
+  failedGradientColors,
+} from "../util/linearGradient";
+import { Marks } from "..";
 
 interface WinnerProps {
+  marks: Marks;
   board: BoardSquare[][] | undefined;
   winner: WinningStatus;
   onPressNewGame: () => void;
 }
 
-export default function Winner({ board, winner, onPressNewGame }: WinnerProps) {
+export default function Winner({
+  marks,
+  board,
+  winner,
+  onPressNewGame,
+}: WinnerProps) {
+  const [backgroundColor, setBackgroundColor] = useState<string[]>(
+    defaultGradientColors,
+  );
+
+  function defineColor(): void {
+    if (marks.playerMark === BoardSquareState.X && winner === WinningStatus.X) {
+      setBackgroundColor(winnerGradientColors);
+      return;
+    }
+
+    if (marks.playerMark === BoardSquareState.O && winner === WinningStatus.O) {
+      setBackgroundColor(winnerGradientColors);
+      return;
+    }
+
+    if (marks.playerMark === BoardSquareState.X && winner === WinningStatus.O) {
+      setBackgroundColor(failedGradientColors);
+      return;
+    }
+
+    if (marks.playerMark === BoardSquareState.O && winner === WinningStatus.X) {
+      setBackgroundColor(failedGradientColors);
+      return;
+    }
+
+    setBackgroundColor(defaultGradientColors);
+  }
+
+  useEffect(() => {
+    defineColor();
+  }, [winner]);
+
   return (
     <Modal
       animationType="slide"
       visible={winner === WinningStatus.NO_WINNER ? false : true}
     >
-      <LinearGradient colors={linearGradientColors} style={styles.modalContent}>
+      <LinearGradient colors={backgroundColor} style={styles.modalContent}>
         <View style={styles.winnerContainer}>
           {winner !== WinningStatus.DRAW && (
             <Text style={styles.winnerText}>Winner</Text>

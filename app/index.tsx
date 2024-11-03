@@ -12,7 +12,7 @@ import { BoardSquare, BoardSquareState, WinningStatus } from "./util/dataTypes";
 import { SelectMark } from "./component/SelectMark";
 import Board from "./component/Board";
 import Winner from "./component/Winner";
-import { linearGradientColors } from "./util/linearGradient";
+import { defaultGradientColors } from "./util/linearGradient";
 
 interface JSONData {
   board: BoardSquare[][];
@@ -109,7 +109,7 @@ export default function Index() {
 
   return (
     <LinearGradient
-      colors={linearGradientColors}
+      colors={defaultGradientColors}
       style={{
         flex: 1,
         justifyContent: "center",
@@ -120,7 +120,12 @@ export default function Index() {
       <View>{error && <Text>{error}</Text>}</View>
       <View>{loading && <Text>Loading</Text>}</View>
       <View>
-        <Winner board={board} onPressNewGame={onPressReset} winner={winner} />
+        <Winner
+          marks={marks}
+          board={board}
+          onPressNewGame={onPressReset}
+          winner={winner}
+        />
         {marks.playerMark === BoardSquareState.EMPTY && (
           <View>
             <SelectMark onSelectMark={onSelectMark} />
