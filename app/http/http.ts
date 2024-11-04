@@ -23,7 +23,6 @@ export async function postMarks(url: string, marks: Marks) {
     });
     if (!response.ok) throw new Error("Response not ok");
     const result = await response.json();
-    console.log("result: ", result);
 
     return result;
   } catch (error) {

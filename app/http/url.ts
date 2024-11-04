@@ -1,4 +1,4 @@
-const backendUrl = `http://172.20.10.6:3000`;
+const backendUrl = `http://149.102.138.197:3000`;
 
 export const getBoardPath = `${backendUrl}/get-board`;
 export const updateBoardPath = `${backendUrl}/update-board`;
