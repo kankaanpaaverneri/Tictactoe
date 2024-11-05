@@ -94,15 +94,19 @@ export default function Index() {
 
   useEffect(() => {
     async function resetBoard() {
+      setLoading(() => true);
       await getHttp(resetBoardPath);
+      setLoading(() => false);
     }
     resetBoard();
   }, []);
 
   useEffect(() => {
     async function sendMarks() {
+      setLoading(() => true);
       const result = await postMarks(setMarksPath, marks);
       await getBoard();
+      setLoading(() => false);
     }
     if (marks.playerMark !== BoardSquareState.EMPTY) sendMarks();
   }, [marks]);
@@ -118,7 +122,7 @@ export default function Index() {
       }}
     >
       <View>{error && <Text>{error}</Text>}</View>
-      <View>{loading && <Text>Loading</Text>}</View>
+      <View>{loading && <Text style={styles.loadingText}>Loading</Text>}</View>
       <View>
         <Winner
           marks={marks}
@@ -151,6 +155,11 @@ export default function Index() {
 const styles = StyleSheet.create({
   mainContainer: {
     flexDirection: "column",
+  },
+  loadingText: {
+    color: "white",
+    fontSize: 25,
+    fontWeight: "bold",
   },
   gameAreaContainer: {},
   boardContainer: {
